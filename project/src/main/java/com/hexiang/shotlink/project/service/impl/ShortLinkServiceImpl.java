@@ -19,7 +19,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         //TODO 增加
         String shortLink = generateShortLinkHashString(requestParm);
         ShortLinkDO shortLinkDO = BeanUtil.toBean(requestParm, ShortLinkDO.class);
-        shortLinkDO.setFullShortUrl(requestParm.getOriginUrl() + '/' + shortLink);
+        shortLinkDO.setFullShortUrl(requestParm.getDomain() + '/' + shortLink);
         shortLinkDO.setShortUrl(shortLink);
         shortLinkDO.setEnableStatus(0);
         shortLinkDO.setValidDataType(2);
