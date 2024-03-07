@@ -1,9 +1,12 @@
 package com.hexiang.shotlink.project.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hexiang.shotlink.project.dao.entity.ShortLinkDO;
+import com.hexiang.shotlink.project.dto.req.ShortLinkPageReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.hexiang.shotlink.project.dto.resp.ShortLinkPageRespDTO;
 
 public interface ShortLinkService extends IService<ShortLinkDO> {
     /**
@@ -13,4 +16,6 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @return
      */
     public ShortLinkCreateRespDTO createShortLink(ShotLinkCreateReqDTO requestParm);
+
+    IPage<ShortLinkPageRespDTO> pageSelect(ShortLinkPageReqDTO shortLinkPageReqDTO);
 }

@@ -1,12 +1,17 @@
 package com.hexiang.shotlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hexiang.shotlink.project.common.convention.exception.ClientException;
 import com.hexiang.shotlink.project.dao.entity.ShortLinkDO;
 import com.hexiang.shotlink.project.dao.mapper.ShortLinkMapper;
+import com.hexiang.shotlink.project.dto.req.ShortLinkPageReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.hexiang.shotlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.hexiang.shotlink.project.service.ShortLinkService;
 import com.hexiang.shotlink.project.toolkit.HashUtil;
 import org.redisson.api.RBloomFilter;
@@ -44,6 +49,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .shortUrl(shortLinkDO.getShortUrl())
                 .fullShortUrl(shortLinkDO.getFullShortUrl())
                 .build();
+    }
+
+    @Override
+    public IPage<ShortLinkPageRespDTO> pageSelect(ShortLinkPageReqDTO shortLinkPageReqDTO) {
+        LambdaQueryWrapper<ShortLinkDO> shortLinkDOLambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, shortLinkPageReqDTO.getGid())
+                .eq(ShortLinkDO::getDelFlag, 0);
+        IPage<ShortLinkDO> results = baseMapper.selectPage(shortLinkPageReqDTO, shortLinkDOLambdaQueryWrapper);
+        return results.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
     }
 
     private String generateShortLinkHashString(ShotLinkCreateReqDTO requestParm){
