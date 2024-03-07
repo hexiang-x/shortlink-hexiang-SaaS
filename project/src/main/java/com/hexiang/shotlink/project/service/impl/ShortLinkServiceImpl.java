@@ -22,14 +22,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private RBloomFilter<String> shortlinkCreateRBloomFilter;
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShotLinkCreateReqDTO requestParm) {
-        //TODO 增加
 
         String shortLink = generateShortLinkHashString(requestParm);
-//        ShortLinkDO shortLinkDO = BeanUtil.toBean(requestParm, ShortLinkDO.class);
-//        shortLinkDO.setFullShortUrl(requestParm.getDomain() + '/' + shortLink);
-//        shortLinkDO.setShortUrl(shortLink);
-//        shortLinkDO.setEnableStatus(0);
-//        shortLinkDO.setValidDataType(2);
         ShortLinkDO shortLinkDO = ShortLinkDO.builder().domain(requestParm.getDomain())
                 .originUrl(requestParm.getOriginUrl())
                 .gid(requestParm.getGid())
