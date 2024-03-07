@@ -21,6 +21,7 @@ import com.hexiang.shotlink.admin.dto.req.UserRegisterReqDTO;
 import com.hexiang.shotlink.admin.dto.req.UserUpdateReqDTO;
 import com.hexiang.shotlink.admin.dto.resp.UserLoginTokenRespDTO;
 import com.hexiang.shotlink.admin.dto.resp.UserRespDTO;
+import com.hexiang.shotlink.admin.service.GroupService;
 import com.hexiang.shotlink.admin.service.UserService;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
@@ -45,6 +46,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private RedissonClient redissonClient;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private GroupService groupService;
 
     @Override
     public UserRespDTO getUserByUserName(String username) {
@@ -84,6 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new ClientException(USER_EXIST);
                 }
                 cachePenetrationBloomFilter.add(requestParm.getUsername());
+                groupService.saveShortLink(requestParm.getUsername(), "默认分组");
                 return;
             }
             throw new ClientException(USER_NAME_EXIST);

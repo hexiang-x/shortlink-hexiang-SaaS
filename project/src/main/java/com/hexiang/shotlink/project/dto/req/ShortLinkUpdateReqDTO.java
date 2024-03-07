@@ -1,30 +1,13 @@
-package com.hexiang.shotlink.project.dao.entity;
+package com.hexiang.shotlink.project.dto.req;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.hexiang.shotlink.project.common.database.BaseDO;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
-@TableName("t_link")
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ShortLinkDO extends BaseDO {
-
-    /**
-     * id
-     */
-    private Long id;
-
+public class ShortLinkUpdateReqDTO {
     /**
      * domain
      */
@@ -46,24 +29,15 @@ public class ShortLinkDO extends BaseDO {
     private String originUrl;
 
     /**
-     * click_num
-     */
-    private Integer clickNum;
-
-    /**
      * gid
      */
     private String gid;
 
     /**
-     * enable_status
+     * 原始GID
      */
-    private Integer enableStatus;
+    private String originalGid;
 
-    /**
-     * create_type
-     */
-    private Integer createType;
 
     /**
      * valid_data_type
@@ -86,10 +60,5 @@ public class ShortLinkDO extends BaseDO {
      * 网站标识
      */
     private String favicon;
-
-//    /**
-//     * 删除标识
-//     */
-//    private Integer delFlag;
 
 }

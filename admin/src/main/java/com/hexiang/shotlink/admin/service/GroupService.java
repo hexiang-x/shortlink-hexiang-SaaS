@@ -17,6 +17,8 @@ public interface GroupService extends IService<GroupDO> {
      */
     public void saveShortLink(String name);
 
+    public void saveShortLink(String username, String name);
+
     /**
      * 查询所有分组
      * @return 分组列表

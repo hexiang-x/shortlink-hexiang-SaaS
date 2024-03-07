@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,14 +37,18 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {};
     @Override
     public void saveShortLink(String name) {
+        saveShortLink(UserContext.getUsername(), name);
+    }
+
+    public void saveShortLink(String username, String name) {
         String gid = null;
         do{
             gid = RandomGenerator.generateRandom();
-        }while (hasGid(gid));
+        }while (hasGid(username, gid));
         GroupDO groupDo = GroupDO.builder()
                 .gid(gid)
                 .sortOrder(0)
-                .username(UserContext.getUsername())
+                .username(username)
                 .name(name)
                 .build();
         baseMapper.insert(groupDo);
@@ -74,7 +79,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     @Override
     public Boolean deleteGroup(String gid) {
-        if(!hasGid(gid)){
+        if(!hasGid(UserContext.getUsername(), gid)){
             throw new ClientException("分组不存在");
         }
         LambdaQueryWrapper<GroupDO> eq = Wrappers.lambdaQuery(GroupDO.class)
@@ -96,10 +101,10 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         });
     }
 
-    private boolean hasGid(String gid){
+    private boolean hasGid(String username, String gid){
         LambdaQueryWrapper<GroupDO> eq = Wrappers.lambdaQuery(GroupDO.class)
-                .eq(GroupDO::getGid, gid);
-        //        .eq(GroupDO::getUsername, UserContext.getUsername());
+                .eq(GroupDO::getGid, gid)
+                .eq(GroupDO::getUsername, Optional.ofNullable(username).orElse(UserContext.getUsername()));
         GroupDO groupDO = baseMapper.selectOne(eq);
         return groupDO  != null;
     }
