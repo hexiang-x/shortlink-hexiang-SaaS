@@ -52,6 +52,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         return ShortLinkCreateRespDTO.builder()
                 .gid(requestParm.getGid())
                 .shortUrl(shortLinkDO.getShortUrl())
+                .originUrl(shortLinkDO.getOriginUrl())
                 .fullShortUrl(shortLinkDO.getFullShortUrl())
                 .build();
     }
