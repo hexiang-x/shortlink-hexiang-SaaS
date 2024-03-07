@@ -6,13 +6,13 @@ import com.hexiang.shotlink.project.common.convention.result.Results;
 import com.hexiang.shotlink.project.dto.req.ShortLinkPageReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.hexiang.shotlink.project.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.hexiang.shotlink.project.service.ShortLinkService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class ShortLinkController {
@@ -27,5 +27,10 @@ public class ShortLinkController {
     @GetMapping("/api/short-link/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageSelect(ShortLinkPageReqDTO shortLinkPageReqDTO){
         return Results.success(shortLinkService.pageSelect(shortLinkPageReqDTO));
+    }
+
+    @GetMapping("/api/short-link/v1/groupcount")
+    public Result<List<ShortLinkGroupCountResqDTO>> groupCount(@RequestParam List<String> requestParm){
+        return Results.success(shortLinkService.groupCount(requestParm));
     }
 }

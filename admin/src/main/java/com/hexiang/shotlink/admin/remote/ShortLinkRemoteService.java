@@ -11,6 +11,7 @@ import com.hexiang.shotlink.admin.common.convention.result.Result;
 import com.hexiang.shotlink.admin.common.convention.result.Results;
 import com.hexiang.shotlink.admin.remote.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
+import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import com.hexiang.shotlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public interface ShortLinkRemoteService {
@@ -37,4 +39,10 @@ public interface ShortLinkRemoteService {
     }
 
 
+    default Result<List<ShortLinkGroupCountResqDTO>> groupCount(List<String> requestParm){
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("requestParm", requestParm);
+        String responseParm = HttpUtil.get("http://localhost:8001/api/short-link/v1/groupcount", map);
+        return JSON.parseObject(responseParm, new TypeReference<>() {});
+    }
 }

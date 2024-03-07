@@ -57,17 +57,17 @@ public class ShortLinkDO extends BaseDO {
     /**
      * enable_status
      */
-    private int enableStatus;
+    private Integer enableStatus;
 
     /**
      * create_type
      */
-    private int createType;
+    private Integer createType;
 
     /**
      * valid_data_type
      */
-    private int validDataType;
+    private Integer validDataType;
 
     /**
      * valid_data

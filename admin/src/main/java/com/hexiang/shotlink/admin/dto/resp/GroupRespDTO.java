@@ -15,6 +15,11 @@ public class GroupRespDTO {
     private String name;
 
     /**
+     * 分组中短链接数量
+     */
+    private Integer count;
+
+    /**
      * 分组排序
      */
     private Integer sortOrder;

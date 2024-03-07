@@ -7,11 +7,11 @@ import com.hexiang.shotlink.admin.remote.ShortLinkRemoteService;
 import com.hexiang.shotlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.hexiang.shotlink.admin.remote.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
+import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class ShortLinkController {
@@ -25,4 +25,9 @@ public class ShortLinkController {
     public Result<IPage<ShortLinkPageRespDTO>> pageSelect(ShortLinkPageReqDTO shortLinkPageReqDTO){
         return shortLinkRemoteService.pageSelect(shortLinkPageReqDTO);
     }
+    @GetMapping("/api/short-link/admin/v1/groupcount")
+    public Result<List<ShortLinkGroupCountResqDTO>> groupCount(@RequestParam List<String> requestParm){
+        return shortLinkRemoteService.groupCount(requestParm);
+    }
+
 }

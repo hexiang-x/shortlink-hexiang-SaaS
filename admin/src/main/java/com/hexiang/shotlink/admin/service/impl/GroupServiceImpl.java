@@ -9,11 +9,17 @@ import com.hexiang.shotlink.admin.common.biz.user.UserContext;
 import com.hexiang.shotlink.admin.common.biz.user.UserInfoDTO;
 import com.hexiang.shotlink.admin.common.convention.exception.ClientException;
 import com.hexiang.shotlink.admin.common.convention.exception.ServiceException;
+import com.hexiang.shotlink.admin.common.convention.result.Result;
+import com.hexiang.shotlink.admin.controller.ShortLinkController;
 import com.hexiang.shotlink.admin.dao.entity.GroupDO;
 import com.hexiang.shotlink.admin.dao.mapper.GroupMapper;
 import com.hexiang.shotlink.admin.dto.req.GroupSortReqDTO;
 import com.hexiang.shotlink.admin.dto.req.GroupUpdateReqDTO;
 import com.hexiang.shotlink.admin.dto.resp.GroupRespDTO;
+import com.hexiang.shotlink.admin.remote.ShortLinkRemoteService;
+import com.hexiang.shotlink.admin.remote.dto.req.ShotLinkCreateReqDTO;
+import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
+import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.admin.service.GroupService;
 import com.hexiang.shotlink.admin.service.UserService;
 import com.hexiang.shotlink.admin.toolkit.RandomGenerator;
@@ -21,10 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
 
+    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {};
     @Override
     public void saveShortLink(String name) {
         String gid = null;
@@ -46,7 +55,11 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUsername);
         List<GroupDO> groupDOS = baseMapper.selectList(hexiang);
-        return BeanUtil.copyToList(groupDOS, GroupRespDTO.class);
+        List<GroupRespDTO> result = BeanUtil.copyToList(groupDOS, GroupRespDTO.class);
+        List<ShortLinkGroupCountResqDTO> data = shortLinkRemoteService.groupCount(groupDOS.stream().map(GroupDO::getGid).toList()).getData();
+        Map<String, Integer> counts = data.stream().collect(Collectors.toMap(ShortLinkGroupCountResqDTO::getGid, ShortLinkGroupCountResqDTO::getCount));
+
+        return result.stream().peek(each -> each.setCount(counts.get(each.getGid()))).toList();
     }
 
     @Override

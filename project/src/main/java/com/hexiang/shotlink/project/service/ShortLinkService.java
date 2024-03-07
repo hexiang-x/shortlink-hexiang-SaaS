@@ -6,7 +6,10 @@ import com.hexiang.shotlink.project.dao.entity.ShortLinkDO;
 import com.hexiang.shotlink.project.dto.req.ShortLinkPageReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.hexiang.shotlink.project.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkPageRespDTO;
+
+import java.util.List;
 
 public interface ShortLinkService extends IService<ShortLinkDO> {
     /**
@@ -18,4 +21,6 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     public ShortLinkCreateRespDTO createShortLink(ShotLinkCreateReqDTO requestParm);
 
     IPage<ShortLinkPageRespDTO> pageSelect(ShortLinkPageReqDTO shortLinkPageReqDTO);
+
+    List<ShortLinkGroupCountResqDTO> groupCount(List<String> requestParm);
 }

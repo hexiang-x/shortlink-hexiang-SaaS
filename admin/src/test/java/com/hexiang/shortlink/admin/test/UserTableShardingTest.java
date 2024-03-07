@@ -1,26 +1,18 @@
 package com.hexiang.shortlink.admin.test;
 
 public class UserTableShardingTest {
-    private final static String Sql = "CREATE TABLE `t_link_%d`  (\n" +
-            "  `id` bigint(20) NOT NULL COMMENT 'ID',\n" +
-            "  `domain` varchar(128) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,\n" +
-            "  `short_url` varchar(8) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,\n" +
-            "  `full_short_url` varchar(128) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,\n" +
-            "  `origin_url` varchar(1024) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,\n" +
-            "  `click_num` int(11) UNSIGNED ZEROFILL NULL DEFAULT NULL,\n" +
-            "  `gid` varchar(32) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,\n" +
-            "  `favicon` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '网站标识图片地址',\n" +
-            "  `enable_status` tinyint(1) NULL DEFAULT NULL,\n" +
-            "  `create_type` tinyint(1) NULL DEFAULT NULL,\n" +
-            "  `valid_data_type` tinyint(1) NULL DEFAULT NULL,\n" +
-            "  `valid_data` datetime NULL DEFAULT NULL,\n" +
-            "  `describe` varchar(1024) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,\n" +
+    private final static String Sql = "CREATE TABLE `t_group_%d`  (\n" +
+            "  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',\n" +
+            "  `gid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '分组标识',\n" +
+            "  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '分组名称',\n" +
+            "  `username` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建分组用户名',\n" +
+            "  `sort_order` int(3) NULL DEFAULT NULL COMMENT '分组排序',\n" +
             "  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',\n" +
             "  `update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',\n" +
             "  `del_flag` tinyint(1) NULL DEFAULT NULL COMMENT '删除标识 0：未删除 1：已删除',\n" +
             "  PRIMARY KEY (`id`) USING BTREE,\n" +
-            "  UNIQUE INDEX `idx_unique_full_short`(`full_short_url`) USING BTREE\n" +
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+            "  UNIQUE INDEX `idx_unique_username_gid`(`gid`, `username`) USING BTREE\n" +
+            ") ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;";
 
     public static void main(String[] args) {
         for(int i = 0; i < 16; i ++){
