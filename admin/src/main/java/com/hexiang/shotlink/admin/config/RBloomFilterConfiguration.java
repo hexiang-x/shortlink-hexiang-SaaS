@@ -5,6 +5,9 @@ import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 布隆过滤器：过滤注册用户名
+ */
 @Configuration
 public class RBloomFilterConfiguration {
 

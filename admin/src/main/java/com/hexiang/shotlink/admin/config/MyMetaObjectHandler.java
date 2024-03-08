@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 
+/**
+ * MybatisPlus 自动填充内容
+ */
 @Component("myMetaObjectHandlerByAdmin")
 public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override

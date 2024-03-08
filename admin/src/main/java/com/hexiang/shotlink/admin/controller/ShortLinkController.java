@@ -14,23 +14,48 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 短链接接口（远程调用中台接口）
+ */
 @RestController
 public class ShortLinkController {
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {};
 
+    /**
+     * 新增短链接
+     * @param requestParm
+     * @return
+     */
     @PostMapping("/api/short-link/admin/v1/create")
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShotLinkCreateReqDTO requestParm){
         return shortLinkRemoteService.createShortLink(requestParm);
     }
+
+    /**
+     * 分页查询
+     * @param shortLinkPageReqDTO
+     * @return
+     */
     @GetMapping("/api/short-link/admin/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageSelect(ShortLinkPageReqDTO shortLinkPageReqDTO){
         return shortLinkRemoteService.pageSelect(shortLinkPageReqDTO);
     }
+
+    /**
+     * 查询分组数量
+     * @param requestParm
+     * @return
+     */
     @GetMapping("/api/short-link/admin/v1/groupcount")
     public Result<List<ShortLinkGroupCountResqDTO>> groupCount(@RequestParam List<String> requestParm){
         return shortLinkRemoteService.groupCount(requestParm);
     }
 
+    /**
+     * 更新短链接
+     * @param shortLinkUpdateReqDTO
+     * @return
+     */
     @PutMapping("/api/short-link/admin/v1/update")
     public Result<Boolean> updateShortLink(@RequestBody ShortLinkUpdateReqDTO shortLinkUpdateReqDTO){
         return shortLinkRemoteService.updateShortLink(shortLinkUpdateReqDTO);

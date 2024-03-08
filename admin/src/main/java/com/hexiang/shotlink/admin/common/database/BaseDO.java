@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * 公共表属性
+ */
 @Data
 public class BaseDO {
     /**

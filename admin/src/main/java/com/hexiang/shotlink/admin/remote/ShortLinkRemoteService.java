@@ -24,11 +24,18 @@ import java.util.*;
 
 public interface ShortLinkRemoteService {
 
+    /**
+     * 远程调用中台
+     * @param requestParm
+     * @return
+     */
     default Result<ShortLinkCreateRespDTO> createShortLink(ShotLinkCreateReqDTO requestParm){
         String responseBodyString = HttpUtil.post("http://localhost:8001/api/short-link/v1/create", JSON.toJSONString(requestParm));
         return JSON.parseObject(responseBodyString, new TypeReference<Result<ShortLinkCreateRespDTO>>() {});
     }
-
+    /**
+     * 远程调用中台
+     */
     default Result<IPage<ShortLinkPageRespDTO>> pageSelect(ShortLinkPageReqDTO shortLinkPageReqDTO){
         HashMap<String ,Object> map = new HashMap<>();
         map.put("gid", shortLinkPageReqDTO.getGid());
@@ -38,14 +45,18 @@ public interface ShortLinkRemoteService {
         return JSON.parseObject(responseParm, new TypeReference<>() {});
     }
 
-
+    /**
+     * 远程调用中台
+     */
     default Result<List<ShortLinkGroupCountResqDTO>> groupCount(List<String> requestParm){
         HashMap<String, Object> map = new HashMap<>();
         map.put("requestParm", requestParm);
         String responseParm = HttpUtil.get("http://localhost:8001/api/short-link/v1/groupcount", map);
         return JSON.parseObject(responseParm, new TypeReference<>() {});
     }
-
+    /**
+     * 远程调用中台
+     */
     default Result<Boolean> updateShortLink(ShortLinkUpdateReqDTO shortLinkUpdateReqDTO){
         String responseBodystring = HttpRequest.put("http://localhost:8001/api/short-link/v1/update").body(JSON.toJSONString(shortLinkUpdateReqDTO)).execute().body();
         // String responseBodyString = HttpUtil.("http://localhost:8001/api/short-link/v1/update", JSON.toJSONString(shortLinkUpdateReqDTO));

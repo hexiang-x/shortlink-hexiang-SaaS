@@ -18,6 +18,9 @@ import java.util.HashSet;
 
 import static com.hexiang.shotlink.admin.common.constant.RedisCacheConstant.USER_LOGIN_KEY;
 
+/**
+ * 用户过滤器
+ */
 @RequiredArgsConstructor
 public class UserTransmitFilter implements Filter {
     private StringRedisTemplate stringRedisTemplate;
