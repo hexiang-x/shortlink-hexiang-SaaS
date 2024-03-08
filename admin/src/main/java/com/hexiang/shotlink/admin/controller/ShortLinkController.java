@@ -5,6 +5,7 @@ import com.hexiang.shotlink.admin.common.convention.result.Result;
 import com.hexiang.shotlink.admin.common.convention.result.Results;
 import com.hexiang.shotlink.admin.remote.ShortLinkRemoteService;
 import com.hexiang.shotlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import com.hexiang.shotlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import com.hexiang.shotlink.admin.remote.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkGroupCountResqDTO;
@@ -29,5 +30,11 @@ public class ShortLinkController {
     public Result<List<ShortLinkGroupCountResqDTO>> groupCount(@RequestParam List<String> requestParm){
         return shortLinkRemoteService.groupCount(requestParm);
     }
+
+    @PutMapping("/api/short-link/admin/v1/update")
+    public Result<Boolean> updateShortLink(@RequestBody ShortLinkUpdateReqDTO shortLinkUpdateReqDTO){
+        return shortLinkRemoteService.updateShortLink(shortLinkUpdateReqDTO);
+    }
+
 
 }
