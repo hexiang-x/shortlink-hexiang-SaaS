@@ -5,6 +5,8 @@ import com.hexiang.shotlink.admin.dao.entity.GroupDO;
 import com.hexiang.shotlink.admin.dto.req.GroupSortReqDTO;
 import com.hexiang.shotlink.admin.dto.req.GroupUpdateReqDTO;
 import com.hexiang.shotlink.admin.dto.resp.GroupRespDTO;
+import com.hexiang.shotlink.admin.dto.resp.ShortLinkGroupRespDTO;
+import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkGroupCountResqDTO;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ public interface GroupService extends IService<GroupDO> {
      * 查询所有分组
      * @return 分组列表
      */
-    public List<GroupRespDTO> listGroup();
+    public List<ShortLinkGroupRespDTO> listGroup();
 
     /**
      * 更新一条分组

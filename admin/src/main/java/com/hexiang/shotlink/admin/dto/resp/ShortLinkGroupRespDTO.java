@@ -1,9 +1,9 @@
-package com.hexiang.shotlink.admin.remote.dto.resp;
+package com.hexiang.shotlink.admin.dto.resp;
 
 import lombok.Data;
 
 @Data
-public class ShortLinkGroupCountResqDTO {
+public class ShortLinkGroupRespDTO {
     /**
      * 分组标识
      */

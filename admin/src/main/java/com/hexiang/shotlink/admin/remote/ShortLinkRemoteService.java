@@ -107,4 +107,10 @@ public interface ShortLinkRemoteService {
         });
     }
 
+    default Result<String> getTitleByUrl(String url){
+        Map<String, Object> map = new HashMap<>();
+        map.put("url", url);
+        String responseJSONString = HttpUtil.get("http://localhost:8001/api/short-link/v1/title", map);
+        return JSON.parseObject(responseJSONString, new TypeReference<Result<String>>() {});
+    }
 }

@@ -6,6 +6,8 @@ import com.hexiang.shotlink.admin.dto.req.GroupSaveReqDTO;
 import com.hexiang.shotlink.admin.dto.req.GroupSortReqDTO;
 import com.hexiang.shotlink.admin.dto.req.GroupUpdateReqDTO;
 import com.hexiang.shotlink.admin.dto.resp.GroupRespDTO;
+import com.hexiang.shotlink.admin.dto.resp.ShortLinkGroupRespDTO;
+import com.hexiang.shotlink.admin.remote.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.admin.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +38,8 @@ public class GroupController {
      * @return
      */
     @GetMapping("/api/short-link/admin/v1/group")
-    public Result<List<GroupRespDTO>> listGroup(){
-        List<GroupRespDTO> groupRespDTOS = groupService.listGroup();
+    public Result<List<ShortLinkGroupRespDTO>> listGroup(){
+        List<ShortLinkGroupRespDTO> groupRespDTOS = groupService.listGroup();
         return Results.success(groupRespDTOS);
     }
 
@@ -58,8 +60,8 @@ public class GroupController {
      * @return
      */
     @DeleteMapping("/api/short-link/admin/v1/group")
-    public Result<Boolean> deleteGroup(String Gid){
-        Boolean result = groupService.deleteGroup(Gid);
+    public Result<Boolean> deleteGroup(@RequestParam String gid){
+        Boolean result = groupService.deleteGroup(gid);
         return Results.success(result);
     }
 

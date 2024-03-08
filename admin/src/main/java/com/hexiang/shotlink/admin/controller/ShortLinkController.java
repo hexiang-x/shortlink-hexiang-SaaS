@@ -46,8 +46,8 @@ public class ShortLinkController {
      * @param requestParm
      * @return
      */
-    @GetMapping("/api/short-link/admin/v1/groupcount")
-    public Result<List<ShortLinkGroupCountResqDTO>> groupCount(@RequestParam List<String> requestParm){
+    @GetMapping("/api/short-link/admin/v1/count")
+    public Result<List<ShortLinkGroupCountResqDTO>> groupShortLinkCount(@RequestParam List<String> requestParm){
         return shortLinkRemoteService.groupCount(requestParm);
     }
 
