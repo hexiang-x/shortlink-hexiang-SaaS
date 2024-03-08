@@ -7,6 +7,10 @@ spring:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
     # ShardingSphere ??????
     url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
 
 #      username: root
 #      password: root
