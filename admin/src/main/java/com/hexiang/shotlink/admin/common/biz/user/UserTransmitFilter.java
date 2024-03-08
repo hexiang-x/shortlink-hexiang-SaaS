@@ -2,6 +2,7 @@ package com.hexiang.shotlink.admin.common.biz.user;
 
 
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Lists;
 import com.hexiang.shotlink.admin.common.convention.exception.ClientException;
@@ -40,10 +41,12 @@ public class UserTransmitFilter implements Filter {
             if(!(realUri.equals("/api/short-link/admin/v1/user/login") && method.equals("POST"))){
                 String username = httpServletRequest.getHeader("username");
                 String token = httpServletRequest.getHeader("token");
-                Object userInfoJsonString = stringRedisTemplate.opsForHash().get(USER_LOGIN_KEY + username, token);
-                if(userInfoJsonString != null){
-                    UserInfoDTO userInfoDTO = JSON.parseObject(userInfoJsonString.toString(), UserInfoDTO.class);
-                    UserContext.setUser(userInfoDTO);
+                if (StrUtil.isNotBlank(username) && StrUtil.isNotBlank(token)) {
+                    Object userInfoJsonString = stringRedisTemplate.opsForHash().get(USER_LOGIN_KEY + username, token);
+                    if(userInfoJsonString != null){
+                        UserInfoDTO userInfoDTO = JSON.parseObject(userInfoJsonString.toString(), UserInfoDTO.class);
+                        UserContext.setUser(userInfoDTO);
+                    }
                 }
             }
         }
