@@ -3,6 +3,7 @@ package com.hexiang.shotlink.project.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hexiang.shotlink.project.dao.entity.ShortLinkDO;
+import com.hexiang.shotlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import com.hexiang.shotlink.project.dto.req.ShortLinkPageReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShotLinkCreateReqDTO;
@@ -31,4 +32,6 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     Boolean updateShortLink(ShortLinkUpdateReqDTO shortLinkUpdateReqDTO);
 
     void restoreUrl(String shortlink, HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord);
 }

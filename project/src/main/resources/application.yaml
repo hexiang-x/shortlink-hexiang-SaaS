@@ -27,3 +27,10 @@ spring:
       host: 192.168.8.131
       port: 6379
       password: 123456
+
+
+short-link:
+  stats:
+    locale:
+      #TODO ??IP API
+      amap-key: 824c511f0997586ea016f979fdb23087

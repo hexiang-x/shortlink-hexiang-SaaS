@@ -1,8 +1,10 @@
 package com.hexiang.shotlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -16,15 +18,20 @@ import com.hexiang.shotlink.project.dao.entity.ShortLinkDO;
 import com.hexiang.shotlink.project.dao.entity.ShortLinkGotoDO;
 import com.hexiang.shotlink.project.dao.mapper.ShortLinkGotoMapper;
 import com.hexiang.shotlink.project.dao.mapper.ShortLinkMapper;
+import com.hexiang.shotlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import com.hexiang.shotlink.project.dto.req.ShortLinkPageReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.hexiang.shotlink.project.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkPageRespDTO;
+import com.hexiang.shotlink.project.mq.producer.ShortLinkStatsSaveProducer;
 import com.hexiang.shotlink.project.service.ShortLinkService;
 import com.hexiang.shotlink.project.toolkit.HashUtil;
 import com.hexiang.shotlink.project.toolkit.LinkUtil;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.redisson.api.RBloomFilter;
@@ -37,9 +44,10 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.hexiang.shotlink.project.common.constant.RedisKeyConstant.*;
 
@@ -55,6 +63,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private ShortLinkGotoMapper shortLinkGotoMapper;
+    @Autowired
+    private ShortLinkStatsSaveProducer shortLinkStatsSaveProducer;
 
 
 
@@ -203,6 +213,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         String originalUrl = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
         if(StrUtil.isNotBlank(originalUrl)){
+            ShortLinkStatsRecordDTO shortLinkStatsRecordDTO = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
+            shortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
             response.sendRedirect(originalUrl);
             return;
         }
@@ -221,6 +233,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         RLock rLock = redissonClient.getLock(String.format(LOCK_GOTO_SHORT_LINK_KEY, fullShortUrl));
         rLock.lock();
         try{
+            // 双重锁 判定
+            originalUrl = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
+            if(StrUtil.isNotBlank(originalUrl)){
+                ShortLinkStatsRecordDTO shortLinkStatsRecordDTO = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
+                shortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
+                response.sendRedirect(originalUrl);
+                return;
+            }
             LambdaQueryWrapper<ShortLinkGotoDO> gotoDOLambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
                     .eq(ShortLinkGotoDO::getFullShortLink, fullShortUrl);
             ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(gotoDOLambdaQueryWrapper);
@@ -248,17 +268,74 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidData()),
                     TimeUnit.MILLISECONDS
             );
+            ShortLinkStatsRecordDTO shortLinkStatsRecordDTO = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
+            shortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
             response.sendRedirect(shortLinkDO.getOriginUrl());
         }finally {
             rLock.unlock();
         }
+    }
+    private ShortLinkStatsRecordDTO buildLinkStatsRecordAndSetUser(String fullShortUrl, ServletRequest request, ServletResponse response) {
+        AtomicBoolean uvFirstFlag = new AtomicBoolean();
+        Cookie[] cookies = ((HttpServletRequest) request).getCookies();
+        AtomicReference<String> uv = new AtomicReference<>();
+        Runnable addResponseCookieTask = () -> {
+            uv.set(UUID.fastUUID().toString());
+            Cookie uvCookie = new Cookie("uv", uv.get());
+            uvCookie.setMaxAge(60 * 60 * 24 * 30);
+            uvCookie.setPath(StrUtil.sub(fullShortUrl, fullShortUrl.indexOf("/"), fullShortUrl.length()));
+            ((HttpServletResponse) response).addCookie(uvCookie);
+            uvFirstFlag.set(Boolean.TRUE);
+            stringRedisTemplate.opsForSet().add(SHORT_LINK_STATS_UV_KEY + fullShortUrl, uv.get());
+        };
+        if (ArrayUtil.isNotEmpty(cookies)) {
+            Arrays.stream(cookies)
+                    .filter(each -> Objects.equals(each.getName(), "uv"))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .ifPresentOrElse(each -> {
+                        uv.set(each);
+                        Long uvAdded = stringRedisTemplate.opsForSet().add(SHORT_LINK_STATS_UV_KEY + fullShortUrl, each);
+                        uvFirstFlag.set(uvAdded != null && uvAdded > 0L);
+                    }, addResponseCookieTask);
+        } else {
+            addResponseCookieTask.run();
+        }
+        String remoteAddr = LinkUtil.getActualIp(((HttpServletRequest) request));
+        String os = LinkUtil.getOs(((HttpServletRequest) request));
+        String browser = LinkUtil.getBrowser(((HttpServletRequest) request));
+        String device = LinkUtil.getDevice(((HttpServletRequest) request));
+        String network = LinkUtil.getNetwork(((HttpServletRequest) request));
+        Long uipAdded = stringRedisTemplate.opsForSet().add(SHORT_LINK_STATS_UIP_KEY + fullShortUrl, remoteAddr);
+        boolean uipFirstFlag = uipAdded != null && uipAdded > 0L;
+        return ShortLinkStatsRecordDTO.builder()
+                .fullShortUrl(fullShortUrl)
+                .uv(uv.get())
+                .uvFirstFlag(uvFirstFlag.get())
+                .uipFirstFlag(uipFirstFlag)
+                .remoteAddr(remoteAddr)
+                .os(os)
+                .browser(browser)
+                .device(device)
+                .network(network)
+                .build();
+    }
+
+    @Override
+    public void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord) {
+        Map<String, String> producerMap = new HashMap<>();
+        producerMap.put("fullShortUrl", fullShortUrl);
+        producerMap.put("gid", gid);
+        producerMap.put("statsRecord", JSON.toJSONString(statsRecord));
+        // TODO 增加消息队列
+        shortLinkStatsSaveProducer.send(producerMap);
     }
 
     private String generateShortLinkHashString(ShotLinkCreateReqDTO requestParm){
         String shortLink = HashUtil.hashToBase62(requestParm.getOriginUrl());
         String fullLink = requestParm.getDomain() + "/" + shortLink;
         for(int i = 0; i < 10 && shortlinkCreateRBloomFilter.contains(fullLink); i ++){
-            shortLink = HashUtil.hashToBase62(requestParm.getOriginUrl()+System.currentTimeMillis());
+            shortLink = HashUtil.hashToBase62(requestParm.getOriginUrl()+ UUID.randomUUID());
             fullLink = requestParm.getDomain() + "/" + shortLink;
         }
         if(shortlinkCreateRBloomFilter.contains(fullLink))
