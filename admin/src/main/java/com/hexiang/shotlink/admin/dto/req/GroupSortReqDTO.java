@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class GroupSortReqDTO {
     String gid;
-    Integer sort;
+    Integer sortOrder;
 }

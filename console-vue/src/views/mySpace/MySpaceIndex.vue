@@ -100,7 +100,7 @@
             </template>
             <template #default="scope">
               <div class="table-link-box" :class="{
-                isExpire: scope?.row?.validDateType === 1 && !isExpire(scope?.row?.validDate)
+                isExpire: scope?.row?.validDataType === 1 && !isExpire(scope?.row?.validData)
               }">
                 <img :src="getImgUrl(scope.row.favicon)" :key="scope?.row?.id" width="20" height="20" alt="" />
                 <div class="name-date">
@@ -109,8 +109,8 @@
                   </el-tooltip>
                   <div class="time" style="display: flex">
                     <span>{{ scope.row.createTime }}</span>
-                    <el-tooltip show-after="500" v-if="scope?.row?.validDate" :content="'到期时间：' + scope?.row?.validDate">
-                      <img v-if="isExpire(scope?.row?.validDate)" width="18" height="18" src="@/assets/png/沙漏倒计时.png"
+                    <el-tooltip show-after="500" v-if="scope?.row?.validData" :content="'到期时间：' + scope?.row?.validData">
+                      <img v-if="isExpire(scope?.row?.validData)" width="18" height="18" src="@/assets/png/沙漏倒计时.png"
                         alt="" />
                       <div v-else><span>已失效</span></div>
                     </el-tooltip>
@@ -124,7 +124,7 @@
               <div class="table-url-box">
                 <!-- 当失效后就不能在点击跳转了 -->
                 <el-link type="primary" :underline="false" target="_blank"
-                  :disabled="scope?.row?.validDateType === 1 && !isExpire(scope?.row?.validDate)"
+                  :disabled="scope?.row?.validDataType === 1 && !isExpire(scope?.row?.validData)"
                   :href="'http://' + scope.row.fullShortUrl">{{ scope.row.domain + '/' + scope.row.shortUrl }}</el-link>
                 <el-tooltip show-after="500" :content="scope.row.originUrl">
                   <span>{{ scope.row.originUrl }}</span>
@@ -734,9 +734,9 @@ const getImgUrl = (url) => {
   return url ?? defaultImg
 }
 // 判断链接是否过期
-const isExpire = (validDate) => {
-  if (validDate) {
-    const date = new Date(validDate).getTime()
+const isExpire = (validData) => {
+  if (validData) {
+    const date = new Date(validData).getTime()
     return new Date().getTime() < date
   }
 }

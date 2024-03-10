@@ -106,7 +106,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         requestParm.forEach(groupSortReqDTO -> {
             GroupDO groupDO = GroupDO.builder()
                     .gid(groupSortReqDTO.getGid())
-                    .sortOrder(groupSortReqDTO.getSort())
+                    .sortOrder(groupSortReqDTO.getSortOrder())
                     .build();
             LambdaUpdateWrapper<GroupDO> eq = Wrappers.lambdaUpdate(GroupDO.class)
                     .eq(GroupDO::getGid, groupDO.getGid());

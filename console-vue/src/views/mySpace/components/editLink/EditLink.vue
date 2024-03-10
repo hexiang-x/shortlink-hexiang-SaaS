@@ -15,13 +15,13 @@
         </el-select>
       </el-form-item>
       <el-form-item label="有效期" prop="v">
-        <el-radio-group v-model="formData.validDateType">
+        <el-radio-group v-model="formData.validDataType">
           <el-radio :label="0">永久</el-radio>
           <el-radio :label="1">自定义</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="formData.validDateType === 1" label="选择时间">
-        <el-date-picker :disabled-date="disabledDate" v-model="formData.validDate" value-format="YYYY-MM-DD HH:mm:ss"
+      <el-form-item v-if="formData.validDataType === 1" label="选择时间">
+        <el-date-picker :disabled-date="disabledDate" v-model="formData.validData" value-format="YYYY-MM-DD HH:mm:ss"
           type="datetime" placeholder="选择日期" :shortcuts="shortcuts" />
         <span class="alert">链接失效后将自动跳转到404页面 !</span>
       </el-form-item>
@@ -86,18 +86,18 @@ const formData = reactive({
   gid: editData.gid,
   originGid: editData.gid,
   createdType: editData.createdType,
-  validDate: editData.validDate,
+  validData: editData.validData,
   describe: editData.describe,
-  validDateType: editData.validDateType,
+  validDataType: editData.validDataType,
   fullShortUrl: editData.fullShortUrl
 })
 const initFormData = () => {
   formData.domain = defaultDomain
   formData.originUrl = null
   formData.createdType = 1
-  formData.validDate = null
+  formData.validData = null
   formData.describe = null
-  formData.validDateType = 0
+  formData.validDataType = 0
   formData.fullShortUrl = null
 }
 const maxOriginUrlRows = ref(100)// 最多多少行
@@ -163,9 +163,9 @@ watch(
     formData.gid = nV.gid
     formData.originGid = nV.gid
     formData.createdType = nV.createdType
-    formData.validDate = nV.validDate
+    formData.validData = nV.validData
     formData.describe = nV.describe
-    formData.validDateType = nV.validDateType
+    formData.validDataType = nV.validDataType
     formData.fullShortUrl = nV.fullShortUrl
   },
   {
@@ -210,7 +210,7 @@ const formRule = reactive({
       trigger: 'blur'
     },
   ],
-  validDate: [
+  validData: [
     { required: false, message: '请输日期', trigger: 'blur' },
     // {
     //   validator: function (rule, value, callback) {

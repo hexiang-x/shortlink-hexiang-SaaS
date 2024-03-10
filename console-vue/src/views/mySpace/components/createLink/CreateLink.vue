@@ -39,15 +39,15 @@
         </el-select>
       </el-form-item>
       <el-form-item label="有效期" prop="v">
-        <el-radio-group v-model="formData.validDateType">
+        <el-radio-group v-model="formData.validDataType">
           <el-radio :label="0">永久</el-radio>
           <el-radio :label="1">自定义</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="formData.validDateType === 1" label="选择时间">
+      <el-form-item v-if="formData.validDataType === 1" label="选择时间">
         <el-date-picker
           :disabled-date="disabledDate"
-          v-model="formData.validDate"
+          v-model="formData.validData"
           value-format="YYYY-MM-DD HH:mm:ss"
           type="datetime"
           placeholder="选择日期"
@@ -122,9 +122,9 @@ const formData = reactive({
   originUrl: null,
   gid: null,
   createdType: 1,
-  validDate: null,
+  validData: null,
   describe: null,
-  validDateType: 0
+  validDataType: 0
 })
 watch(
   () => formData,
@@ -139,9 +139,9 @@ const initFormData = () => {
   formData.domain = defaultDomain
   formData.originUrl = null
   formData.createdType = 1
-  formData.validDate = null
+  formData.validData = null
   formData.describe = null
-  formData.validDateType = 0
+  formData.validDataType = 0
 }
 const maxOriginUrlRows = ref(100) // 最多多少行
 // 链接有多少行
@@ -264,7 +264,7 @@ const formRule = reactive({
       trigger: 'blur'
     }
   ],
-  validDate: [
+  validData: [
     { required: false, message: '请输日期', trigger: 'blur' }
     // {
     //   validator: function (rule, value, callback) {

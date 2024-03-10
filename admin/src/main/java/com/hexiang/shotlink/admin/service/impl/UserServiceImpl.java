@@ -99,8 +99,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Override
     public Boolean updateUser(UserUpdateReqDTO requestParm) {
         // TODO 验证当前用户是否登录；
-        LambdaUpdateWrapper<UserDO> eq = Wrappers.lambdaUpdate(UserDO.class).eq(UserDO::getUsername, requestParm.getUsername())
-                .eq(UserDO::getPassword, requestParm.getPassword());
+        LambdaUpdateWrapper<UserDO> eq = Wrappers.lambdaUpdate(UserDO.class)
+                .eq(UserDO::getUsername, requestParm.getUsername());
         int updateStatus = baseMapper.update(BeanUtil.toBean(requestParm, UserDO.class), eq);
         return updateStatus > 0;
     }

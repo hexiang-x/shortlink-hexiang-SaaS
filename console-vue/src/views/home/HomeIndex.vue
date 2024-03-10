@@ -5,7 +5,7 @@
         <div class="header">
           <div @click="toMySpace" class="logo">拿个offer-SaaS短链接</div>
           <div style="display: flex; align-items: center">
-            <a
+            <!-- <a
               class="link-span"
               style="text-decoration: none"
               target="_blank"
@@ -32,7 +32,7 @@
                 target="_blank"
                 href="http://shortlink.magestack.cn"
             >演示环境</a
-            >
+            > -->
             <el-dropdown>
               <div class="block">
                 <span

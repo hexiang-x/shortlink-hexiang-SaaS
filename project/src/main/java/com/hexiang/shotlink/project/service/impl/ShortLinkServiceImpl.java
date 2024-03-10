@@ -71,6 +71,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .fullShortUrl(requestParm.getDomain() + '/' + shortLink)
                 .enableStatus(0)
                 .build();
+        shortLinkDO.setValidData(requestParm.getValidData());
+        shortLinkDO.setValidDataType(requestParm.getValidDataType());
 
         ShortLinkGotoDO shortLinkGotoDO = ShortLinkGotoDO.builder()
                 .fullShortLink(shortLinkDO.getFullShortUrl())
