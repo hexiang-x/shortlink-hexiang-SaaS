@@ -243,7 +243,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 return;
             }
             stringRedisTemplate.opsForValue().set(
-                    String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
+                    String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),
                     shortLinkDO.getOriginUrl(),
                     LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidData()),
                     TimeUnit.MILLISECONDS
