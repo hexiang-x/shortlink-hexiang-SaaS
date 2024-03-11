@@ -453,8 +453,8 @@ const chartsVisible = async (rowInfo, dateList) => {
     initStatsFormData()
   } else {
     // 否则就按照传过来的数据去请求数据
-    statsFormData.startDate = dateList?.[0] + ' 00:00:00'
-    statsFormData.endDate = dateList?.[1] + ' 23:59:59'
+    statsFormData.startDate = dateList?.[0]
+    statsFormData.endDate = dateList?.[1]
   }
   let res = null
   let tableRes = null
@@ -479,8 +479,8 @@ const changeTimeData = async (rowInfo, dateList) => {
     initStatsFormData()
   } else {
     // 否则就按照传过来的数据去请求数据
-    statsFormData.startDate = dateList?.[0] + ' 00:00:00'
-    statsFormData.endDate = dateList?.[1] + ' 23:59:59'
+    statsFormData.startDate = dateList?.[0]
+    statsFormData.endDate = dateList?.[1]
   }
   let res = null
   let tableRes = null
