@@ -2,6 +2,8 @@ server:
   port: 8001
 
 spring:
+  application:
+    name: short-link-project
   datasource:
     # ShardingSphere ? Driver ???????????????
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
@@ -11,8 +13,13 @@ spring:
     view:
       prefix: /templates/
       suffix: .html
-
-#      username: root
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        username: nacos
+        password: nacos
+  #      username: root
 #      password: root
 #      url: jdbc:mysql://192.168.8.131:3306/shotlink?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8
 #      driver-class-name: com.mysql.cj.jdbc.Driver

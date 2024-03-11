@@ -75,6 +75,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         ShortLinkDO shortLinkDO = ShortLinkDO.builder().domain(requestParm.getDomain())
                 .originUrl(requestParm.getOriginUrl())
                 .gid(requestParm.getGid())
+                .validDataType(requestParm.getValidDataType())
+                .validData(requestParm.getValidData())
                 .createType(requestParm.getCreateType())
                 .describe(requestParm.getDescribe())
                 .shortUrl(shortLink)
@@ -115,7 +117,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         LambdaQueryWrapper<ShortLinkDO> shortLinkDOLambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
                 .eq(ShortLinkDO::getGid, shortLinkPageReqDTO.getGid())
                 .eq(ShortLinkDO::getDelFlag, 0)
-                .eq(ShortLinkDO::getEnableStatus, 0);
+                .eq(ShortLinkDO::getEnableStatus, 0)
+                .and(wrapper -> wrapper.and(
+                        item -> item
+                                .eq(ShortLinkDO::getValidDataType, 1)
+                                .gt(ShortLinkDO::getValidData, new Date()))
+                        .or().eq(ShortLinkDO::getValidDataType, 0)
+                        .or().isNull(ShortLinkDO::getValidDataType)
+                );
+
         IPage<ShortLinkDO> results = baseMapper.selectPage(shortLinkPageReqDTO, shortLinkDOLambdaQueryWrapper);
         return results.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
     }
