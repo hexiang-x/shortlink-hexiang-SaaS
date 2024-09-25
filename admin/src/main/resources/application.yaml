@@ -7,7 +7,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848
+        server-addr: 1.92.72.62:8848
   datasource:
     # ShardingSphere 对 Driver 自定义，实现分库分表等隐藏逻辑
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
@@ -25,9 +25,9 @@ spring:
 #      minimum-idle: 5
   data:
     redis:
-      host: 192.168.8.131
+      host: 1.92.72.62
       port: 6379
-      password: 123456
+      password: hexiang123321
 
 #short-link:
 #  group:

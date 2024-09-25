@@ -25,6 +25,7 @@ import com.hexiang.shotlink.project.dto.req.ShotLinkCreateReqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkGroupCountResqDTO;
 import com.hexiang.shotlink.project.dto.resp.ShortLinkPageRespDTO;
+import com.hexiang.shotlink.project.mq.consumer.ShortLinkStatsSaveConsumer;
 import com.hexiang.shotlink.project.mq.producer.ShortLinkStatsSaveProducer;
 import com.hexiang.shotlink.project.service.ShortLinkService;
 import com.hexiang.shotlink.project.toolkit.HashUtil;
@@ -65,6 +66,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private ShortLinkGotoMapper shortLinkGotoMapper;
     @Autowired
     private ShortLinkStatsSaveProducer shortLinkStatsSaveProducer;
+    @Autowired
+    private ShortLinkStatsSaveConsumer shortLinkStatsSaveConsumer;
 
 
 
@@ -136,6 +139,13 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .in("gid", requestParm)
                 .eq("del_flag", 0)
                 .eq("enable_status", 0)
+                .and(wrapper -> wrapper.and(
+                                item -> item
+                                        .eq("valid_data_type", 1)
+                                        .gt("valid_data", new Date()))
+                        .or().eq("valid_data_type", 0)
+                        .or().isNull("valid_data_type")
+                )
                 .groupBy("gid");
         List<Map<String, Object>> shortLinkDOList = baseMapper.selectMaps(objectQueryWrapper);
         return BeanUtil.copyToList(shortLinkDOList, ShortLinkGroupCountResqDTO.class);
@@ -225,6 +235,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         if(StrUtil.isNotBlank(originalUrl)){
             ShortLinkStatsRecordDTO shortLinkStatsRecordDTO = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
             shortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
+            //TODO 压测1：耦合插入监控数据库
+            //shortLinkStatsSaveConsumer.actualSaveShortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
             response.sendRedirect(originalUrl);
             return;
         }
@@ -280,11 +292,56 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             );
             ShortLinkStatsRecordDTO shortLinkStatsRecordDTO = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
             shortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
+            //TODO 压测1：耦合插入监控数据库
+            //shortLinkStatsSaveConsumer.actualSaveShortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
             response.sendRedirect(shortLinkDO.getOriginUrl());
         }finally {
             rLock.unlock();
         }
     }
+
+//    @Override
+//    public void restoreUrl(String shortlink, HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        String serverName = request.getServerName();
+//        String serverPort = Optional.of(request.getServerPort())
+//                .filter(each -> !Objects.equals(each, 80))
+//                .map(String::valueOf)
+//                .map(each -> ":" + each)
+//                .orElse("");
+//        String fullShortUrl = serverName + serverPort + "/" + shortlink;
+//        boolean isContain = shortlinkCreateRBloomFilter.contains(fullShortUrl);
+//        if(!isContain){
+//            response.sendRedirect("/page/notfound");
+//            return;
+//        }
+//        try{
+//            LambdaQueryWrapper<ShortLinkGotoDO> gotoDOLambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
+//                    .eq(ShortLinkGotoDO::getFullShortLink, fullShortUrl);
+//            ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(gotoDOLambdaQueryWrapper);
+//            if(shortLinkGotoDO == null){
+//                response.sendRedirect("/page/notfound");
+//                return;
+//            }
+//            LambdaQueryWrapper<ShortLinkDO> shortLinkDOLambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+//                    .eq(ShortLinkDO::getGid, shortLinkGotoDO.getGid())
+//                    .eq(ShortLinkDO::getFullShortUrl, shortLinkGotoDO.getFullShortLink())
+//                    .eq(ShortLinkDO::getEnableStatus, 0)
+//                    .eq(ShortLinkDO::getDelFlag, 0);
+//            ShortLinkDO shortLinkDO = baseMapper.selectOne(shortLinkDOLambdaQueryWrapper);
+//            if(shortLinkDO == null || (shortLinkDO.getValidData() != null && shortLinkDO.getValidData().before(new Date()))){
+//                response.sendRedirect("/page/notfound");
+//                return;
+//            }
+//            ShortLinkStatsRecordDTO shortLinkStatsRecordDTO = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
+//            shortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
+//            //TODO 压测1：耦合插入监控数据库
+//            //shortLinkStatsSaveConsumer.actualSaveShortLinkStats(fullShortUrl, null, shortLinkStatsRecordDTO);
+//            response.sendRedirect(shortLinkDO.getOriginUrl());
+//        } catch (Exception ex){
+//            throw ex;
+//        }
+//    }
+
     private ShortLinkStatsRecordDTO buildLinkStatsRecordAndSetUser(String fullShortUrl, ServletRequest request, ServletResponse response) {
         AtomicBoolean uvFirstFlag = new AtomicBoolean();
         Cookie[] cookies = ((HttpServletRequest) request).getCookies();
